@@ -1,32 +1,20 @@
-Pipeline{
-      agent any
-     parameters {
-  choice choices: ['UAT', 'QA', 'DEV'], name: 'ENVIRONMENT'
-}
-             stages{
-                 stage( 'checkout' ){
-                   steps{  
-                      git 'https://github.com/siddhipande3/GRRAS03.git'
-                        }
-                      }
-                  stage( 'build'){
-                    steps{ 
-                        sh 'mvn  install'
-                        }
-                      }
-                   stage( 'Deployment' ){
-                     steps{
-                       script {
-                     if (env.ENVIRONMENT == 'QA' ){
-                       sh 'cp target/GRRAS03.war /home/siddhi/Downloads/apache-tomcat-9.0.93/webapps'
-                       echo "deployment has been done on QA!"
-                          }
-                       else if ( env.ENVIRONMENT == 'UAT' ){
-                        sh 'cp target/GRRAS03.war /home/siddhi/Downloads/apache-tomcat-9.0.93/webapps'
-                          echo "deployment has been done on UAT!"
-                        } }
-                      } }
-                   }
-                  }
+pipeline {
+	agent{
+	label 'slave-label'
+	}
+	stages {
+	    stage('Checkout') {
+	        steps {
+			checkout scm			       
+		      }}
+		stage('Build') {
+	           steps {
+			  sh 'JAVA_HOME=/home/grras/slavedir/jdk-11.0.24  /home/grras/slavedir/apache-maven-3.9.4/bin/mvn install'
+	                 }}
+		stage('Deployment'){
+		    steps {
+			sh 'cp target/GRRAS03.war /home/grras/slavedir/apache-tomcat-9.0.93/webapps'
+			}}	
+}}
   
           
